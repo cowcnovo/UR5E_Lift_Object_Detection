@@ -48,8 +48,8 @@ def object_goal_distance_tanh(
     
     object_goal_dist = object_goal_distance(env, command_name, robot_cfg, object_cfg)
     
-    print("Goal:")
-    print(object_goal_dist)
+    # print("Goal:")
+    # print(object_goal_dist)
 
     lifting_reward = object_is_lifted(env, std_reach, std_height, object_cfg, ee_frame_cfg)
 
@@ -118,8 +118,8 @@ def object_is_lifted(
     reach_reward = object_position_error_tanh(env, std, object_cfg, ee_frame_cfg)
 
     reward = reach_reward * object_height_reward
-    print("Lift:")
-    print(object_height_from_initial, reward)
+    # print("Lift:")
+    # print(object_height_from_initial, reward)
 
     return reward
 

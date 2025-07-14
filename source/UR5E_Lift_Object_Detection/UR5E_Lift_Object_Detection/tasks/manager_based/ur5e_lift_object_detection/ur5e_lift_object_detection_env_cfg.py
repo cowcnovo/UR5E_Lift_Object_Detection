@@ -38,6 +38,8 @@ from .mdp.rewards import not_hit_floor, object_is_lifted, object_stability
 from .mdp.rewards import object_goal_distance_tanh, object_goal_distance
 from .mdp.observations import object_position_in_robot_root_frame
 
+from .object_detection import load_model, reset_model, inference
+
 ##
 # Scene definition
 ##
@@ -93,11 +95,11 @@ class UR5ESceneCfg(InteractiveSceneCfg):
     # Camera
     camera = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/camera",
-        data_types=["depth"],
+        data_types=["rgb"],
         spawn=sim_utils.PinholeCameraCfg(
             focal_length=1.93, focus_distance=0.6, horizontal_aperture=3.896, vertical_aperture=2.453,
         ),
-        width=854,
+        width=640,
         height=480,
         update_period=1/20,
         offset=CameraCfg.OffsetCfg(pos=(1.0, 0.0, 1.85), rot=(0.2126311, -0.6743797, -0.6743797, 0.2126311)), # real, x, y, z (zyx rotation with frames changing with each subrotation)
@@ -201,18 +203,21 @@ class ObservationsCfg:
             }
         )
 
-        object_position = ObsTerm(func=object_position_in_robot_root_frame)
-
-        # object_positions = ObsTerm(
-        #     func=mdp.image_features,
-        #     params={
-        #         "sensor_cfg": SceneEntityCfg("camera"),
-        #         "data_type": "rgb",
-        #         "model_name": "my_detectnet",  # Your custom model name
-        #         "model_zoo_cfg": custom_model_zoo_cfg,  # Pass your config
-        #         "output_type": "positions",  # Custom output format
-        #     }
-        # )
+        object_positions = ObsTerm(
+            func=mdp.image_features,
+            params={
+                "sensor_cfg": SceneEntityCfg("camera"),
+                "data_type": "rgb",
+                "model_name": "yolo_model",
+                "model_zoo_cfg": {
+                    "yolo_model": {
+                        "model": load_model,
+                        "reset": reset_model,
+                        "inference": inference,
+                    }
+                }
+            }
+        )
 
         pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "ee_orientation"})
         goal_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "goal_pose"})
