@@ -21,6 +21,10 @@ def inference(model, images: torch.Tensor) -> torch.Tensor:
             boxesLocations = results[i].boxes.xywhn[0] # Take the first detected box in the image
             bounding_boxes[i] = boxesLocations
 
+    print("\nResults:")
+    print(len(results[0].boxes.xywhn))
+    print(results[0].boxes.cls)
+    print(results[0].boxes.conf)
     print(bounding_boxes)
 
     return bounding_boxes

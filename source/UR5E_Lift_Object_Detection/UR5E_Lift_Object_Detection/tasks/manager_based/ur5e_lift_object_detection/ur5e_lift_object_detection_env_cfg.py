@@ -52,7 +52,14 @@ class UR5ESceneCfg(InteractiveSceneCfg):
     """Designs the scene."""
 
     # Ground-plane
-    ground = AssetBaseCfg(prim_path="/World/defaultGroundPlane", spawn=sim_utils.GroundPlaneCfg())
+    ground = AssetBaseCfg(
+        prim_path="/World/GroundPlane", 
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=os.path.join(os.path.dirname(__file__), "models/plane.usd"),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.3, 0.3, 0.3), metallic=0.5),
+            scale=(1000.0, 1000.0, 1.0),
+        )
+    )
 
     # spawn a cuboid with colliders and rigid body
     Object = RigidObjectCfg(
@@ -97,12 +104,15 @@ class UR5ESceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/camera",
         data_types=["rgb"],
         spawn=sim_utils.PinholeCameraCfg(
-            focal_length=1.93, focus_distance=0.6, horizontal_aperture=3.896, vertical_aperture=2.453,
+            focal_length=1.93, focus_distance=0.8, horizontal_aperture=3.896,
         ),
-        width=640,
-        height=480,
+        width=1280,
+        height=960,
         update_period=1/20,
-        offset=CameraCfg.OffsetCfg(pos=(1.0, 0.0, 1.85), rot=(0.2126311, -0.6743797, -0.6743797, 0.2126311)), # real, x, y, z (zyx rotation with frames changing with each subrotation)
+        offset=CameraCfg.OffsetCfg(
+            pos=(1.0, 0.0, 1.85), 
+            rot=(-0.24184, 0.66446, 0.66446, -0.24184), # real, x, y, z (zyx rotation with frames changing with each subrotation)
+        ),
     )
 
     # lights
@@ -153,7 +163,7 @@ class CommandsCfg:
         asset_name="ur5e",
         body_name="gripper_end_effector", 
         resampling_time_range=(5.0, 5.0),
-        debug_vis=True,
+        debug_vis=False,
         ranges=mdp.UniformPoseCommandCfg.Ranges(
             pos_x=(0.0, 0.0),
             pos_y=(0.4, 0.4),
