@@ -104,7 +104,7 @@ class UR5ESceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/camera",
         data_types=["rgb"],
         spawn=sim_utils.PinholeCameraCfg(
-            focal_length=1.93, focus_distance=0.8, horizontal_aperture=3.896,
+            focal_length=1.5, focus_distance=0.8, horizontal_aperture=3.896,
         ),
         width=1280,
         height=960,
