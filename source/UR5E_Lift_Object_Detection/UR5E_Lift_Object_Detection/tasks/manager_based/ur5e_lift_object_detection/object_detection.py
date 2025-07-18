@@ -59,7 +59,6 @@ def inference(
     depth_data = depth_data.permute(0, 3, 1, 2).to(torch.float32).to(device)
     print(f"Shape of Depth Image: {depth_data.shape}")
 
-    # Estimate distance of the detected object
     object_distances = []
     for i in range(len(bounding_boxes)):
         x_center, y_center, width, height = bounding_boxes[i]
@@ -80,9 +79,12 @@ def inference(
             avg_depth = depth_region.mean().item()
             object_distances.append(avg_depth)
         else:
-            object_distances.append(float('nan'))  # Handle empty regions
+            object_distances.append(0.8)  # Handle empty regions
 
     if len(object_distances) > 0:
         print(f"Object Distance: {object_distances[0]}")
 
-    return bounding_boxes
+    object_distances = torch.tensor(object_distances, device=device)
+
+    combined_results = torch.cat((bounding_boxes, object_distances.unsqueeze(1)), dim=1)
+    return combined_results
