@@ -38,7 +38,7 @@ from .mdp.rewards import not_hit_floor, object_is_lifted, object_stability
 from .mdp.rewards import object_goal_distance_tanh, object_goal_distance
 from .mdp.observations import object_position_in_robot_root_frame
 
-from .object_detection import load_model, reset_model, inference
+from .object_detection import inference
 
 ##
 # Scene definition
@@ -102,7 +102,7 @@ class UR5ESceneCfg(InteractiveSceneCfg):
     # Camera
     camera = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/camera",
-        data_types=["rgb"],
+        data_types=["rgb", "depth"],
         spawn=sim_utils.PinholeCameraCfg(
             focal_length=1.5, focus_distance=0.8, horizontal_aperture=3.896,
         ),
@@ -212,22 +212,8 @@ class ObservationsCfg:
                 "asset_cfg": SceneEntityCfg("ur5e", joint_names=arm_joint_names+gripper_joint_names),
             }
         )
-
-        object_positions = ObsTerm(
-            func=mdp.image_features,
-            params={
-                "sensor_cfg": SceneEntityCfg("camera"),
-                "data_type": "rgb",
-                "model_name": "yolo_model",
-                "model_zoo_cfg": {
-                    "yolo_model": {
-                        "model": load_model,
-                        "reset": reset_model,
-                        "inference": inference,
-                    }
-                }
-            }
-        )
+    
+        object_positions = ObsTerm(func=inference)
 
         pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "ee_orientation"})
         goal_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "goal_pose"})
