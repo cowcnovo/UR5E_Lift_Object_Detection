@@ -12,16 +12,6 @@ def load_model():
         _model = YOLO("/home/ubuntu/Desktop/yolo/runs/detect/train/weights/best.pt")
     return _model
 
-def depth_camera_data(
-    env: ManagerBasedRLEnv,
-    camera_cfg: SceneEntityCfg = SceneEntityCfg("camera"),   
-) -> torch.Tensor:
-    
-    camera = env.scene[camera_cfg.name]
-    data = camera.data.output["depth"]
-
-    return data
-
 def inference(
     env: ManagerBasedRLEnv,
     camera_cfg: SceneEntityCfg = SceneEntityCfg("camera"),
@@ -55,7 +45,7 @@ def inference(
         print("No objects detected.")
 
     # Depth estimation
-    depth_data = depth_camera_data(env, camera_cfg)
+    depth_data = camera.data.output["depth"]
     depth_data = depth_data.permute(0, 3, 1, 2).to(torch.float32).to(device)
     print(f"Shape of Depth Image: {depth_data.shape}")
 
